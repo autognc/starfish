@@ -4,8 +4,7 @@ from .utils import to_quat
 from .rotations import Spherical
 
 class Frame:
-    """
-    Represents a single picture of an object with certain parameters.
+    """Represents a single picture of an object with certain parameters.
 
     There are 6 parameters that independently define a picture:
         1. Object position: the absolute 3D position of the object in the global coordinate system (i.e. where it is in
@@ -22,8 +21,7 @@ class Frame:
 
     def __init__(self, position=(0, 0, 0), distance=100, pose=Quaternion(),
                  lighting=Quaternion(), offset=(0.5, 0.5), background=Quaternion()):
-        """
-        Initializes a picture with all of the parameters it needs.
+        """Initializes a picture with all of the parameters it needs.
 
         A type of "rotation" means any of Spherical, mathutils.Quaternion, mathutils.Euler, or mathutils.Matrix are
         acceptable.
@@ -52,8 +50,7 @@ class Frame:
         self.background = Spherical.from_other(background)
 
     def setup(self, obj, camera, sun):
-        """
-        Sets up a camera, object, and sun into the picture-taking position.
+        """Sets up a camera, object, and sun into the picture-taking position.
 
         Args:
             obj (BlendDataObject): the object that will be the subject of the picture

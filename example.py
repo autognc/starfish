@@ -2,23 +2,26 @@ import numpy as np
 import bpy
 import ssi
 from ssi.rotations import Spherical
+from mathutils import Euler
+
 
 def main():
-    # test code
-    for t in np.arange(0, 2 * np.pi + 0.001, 2 * np.pi / 100):
-        # create a picture
-        frame = ssi.Frame(
-            position=(0, 0, 0),
-            distance=50,
-            pose=Spherical(10.5, 37, 0.4),
-            lighting=Spherical(0, 0, 0),
-            offset=(0.7, 0.2),
-            background=Spherical(t * 2, t, t)
-        )
-        # set it up with cygnus, the camera, and the sun
-        frame.setup(bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"], bpy.data.objects["Sun"])
-        # refresh view
-        bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+    # create two frames
+    a = ssi.Frame(
+        pose=Euler((0, 0, 0)),
+        background=Spherical(0, 0, 0),
+        distance=20
+    )
+    b = ssi.Frame(
+        pose=Euler((np.pi, 0, 0)),
+        background=Spherical(np.pi, np.pi, np.pi),
+        distance=20
+    )
+
+    # create interpolated sequence
+    seq = ssi.Sequence.interpolated([a, b], 100)
+    # set it up with cygnus, the camera, and the sun
+    seq.setup(bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"], bpy.data.objects["Sun"])
 
 if __name__ == "__main__":
     main()

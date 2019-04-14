@@ -10,8 +10,7 @@ convert from a mathutils reprentation to the alternative representation.
 """
 
 class Spherical:
-    """
-    An alternative 3-value representation of a rotation based on spherical coordinates.
+    """An alternative 3-value representation of a rotation based on spherical coordinates.
 
     Imagine a unit sphere centered about an object. Two spherical coordinates (an azimuthal angle, henceforth theta, and
     a polar angle, henceforth phi) define a point on the surface of the sphere, and a corresponding unit vector from the
