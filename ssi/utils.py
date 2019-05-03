@@ -1,5 +1,6 @@
 import numpy as np
-from mathutils import Quaternion
+from mathutils import Quaternion, Vector
+import json
 
 def to_quat(x):
     return x if type(x) is Quaternion else x.to_quaternion()
@@ -60,3 +61,20 @@ def uniform_sphere(n, random=None):
         return theta, phi
     else:
         return np.random.choice(theta, random), np.random.choice(theta, random)
+
+def jsonify(obj):
+    """Serializes an object's attributes into a JSON string with support for mathutils rotation objects.
+
+    All rotation objects are converted to wxyz quaternion form.
+    """
+    d = vars(obj)
+    for key, value in d.items():
+        # handle rotations
+        try:
+            value = to_quat(value)
+            d[key] = list(value)
+        except AttributeError:
+            if type(value) is Vector:
+                d[key] = list(value)
+
+    return json.dumps(d, indent=4)

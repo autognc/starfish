@@ -4,17 +4,40 @@ import ssi
 from ssi.rotations import Spherical
 from mathutils import Euler
 from ssi import utils
+import json
+import time
+import os
+import sys
 
 
 def main():
-    poses = [Euler(args) for args in utils.cartesian([0], np.linspace(0, np.pi, num=100), np.linspace(0, np.pi, num=10))]
-
+    poses = utils.random_rotations(1000)
+    
     seq = ssi.Sequence.exhaustive(
         pose=poses,
-        background=Spherical(0, 0, 0),
         distance=20
     )
-    seq.bake(bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"], bpy.data.objects["Sun"])
+    
+    output_node = bpy.data.scenes["Render"].node_tree.nodes["File Output"]
+    output_node.base_path = "/home/black/TSL/render"
+    for i, frame in enumerate(seq):
+        frame.setup(bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"], bpy.data.objects["Sun"])
+        
+        # add metadata to frame
+        frame.timestamp = int(time.time() * 1000)
+        frame.sequence_name = "1000 random poses"
+        
+        # set output path
+        output_node.file_slots[0].path = f"real#_{i}"
+        output_node.file_slots[1].path = f"mask#_{i}"
+        
+        # dump data to json
+        with open(os.path.join(output_node.base_path, f"{i}.json"), "w") as f:
+            f.write(frame.dumps())
+            
+        # render
+        bpy.ops.render.render(scene="Render")
+
 
 if __name__ == "__main__":
     main()

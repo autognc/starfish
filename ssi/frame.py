@@ -1,7 +1,8 @@
 import numpy as np
 from mathutils import Quaternion, Vector
-from .utils import to_quat
+from .utils import to_quat, jsonify
 from .rotations import Spherical
+import json
 
 class Frame:
     """Represents a single picture of an object with certain parameters.
@@ -48,6 +49,9 @@ class Frame:
         self.lighting = to_quat(lighting)
         self.offset = tuple(offset)
         self.background = Spherical.from_other(background)
+
+    def dumps(self):
+        return jsonify(self)
 
     def setup(self, obj, camera, sun):
         """Sets up a camera, object, and sun into the picture-taking position.
