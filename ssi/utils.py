@@ -7,23 +7,21 @@ def to_quat(x):
 
 def cartesian(*arrays):
     """Returns the cartesian product of multiple 1D arrays.
-
     For example, cartesian([0], [1, 2], [3, 4, 5]) returns:
-
     array([[0, 1, 3],
            [0, 1, 4],
            [0, 1, 5],
            [0, 2, 3],
            [0, 2, 4],
            [0, 2, 5]])
-
     Works with arbitrary objects.
     """
     # must do it this way to prevent numpy from turning any iterable into an np.array
     cleaned = np.empty(len(arrays), dtype=object)
     for i, array in enumerate(arrays):
         subcleaned = np.empty(len(array), dtype=object)
-        subcleaned[:] = array
+        for j in range(len(array)):
+            subcleaned[j] = array[j]
         cleaned[i] = subcleaned
     return np.stack(np.meshgrid(*cleaned), -1).reshape(-1, len(arrays))
 
