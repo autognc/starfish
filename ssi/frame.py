@@ -2,7 +2,7 @@ import numpy as np
 from mathutils import Quaternion, Vector
 from .utils import to_quat, jsonify
 from .rotations import Spherical
-import json
+
 
 class Frame:
     """Represents a single picture of an object with certain parameters.
@@ -53,7 +53,7 @@ class Frame:
     def dumps(self):
         return jsonify(self)
 
-    def setup(self, obj, camera, sun):
+    def setup(self, scene, obj, camera, sun):
         """Sets up a camera, object, and sun into the picture-taking position.
 
         Args:
@@ -76,11 +76,18 @@ class Frame:
 
         # modify camera rotation to produce correct object offset
         x_frac, y_frac = self.offset
-        # convert proporitions to angle offsets using camera FOV
-        # FIXME: the FOV values given by Blender, usually angle_y, are a little off sometimes. It's good enough for
-        #        now, but maybe there's another way to compute the angles that doesn't have this bug
-        x_angle = (x_frac - 0.5) * camera.data.angle_x
-        y_angle = (y_frac - 0.5) * camera.data.angle_y
+        # convert proportions to angle offsets using camera frame
+        # taken partially from bpy_extras.object_utils.world_to_camera_view
+        frame = [v for v in camera.data.view_frame(scene=scene)[:3]]
+        if camera.type != 'ORTHO':
+            frame = [(v / (v.z / self.distance)) for v in frame]
+
+        frame_x, frame_y = frame[2].x, frame[1].y
+        x_offset = (x_frac - 0.5) * 2 * frame_x
+        y_offset = (y_frac - 0.5) * 2 * frame_y
+        x_angle = np.arctan2(x_offset, self.distance)
+        y_angle = np.arctan2(y_offset, self.distance)
+
         # use euler angles to rotate about camera's x and y axes
         camera.rotation_mode = "XYZ"
         camera.rotation_euler.rotate_axis("Y", x_angle)

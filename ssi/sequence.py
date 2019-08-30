@@ -4,6 +4,7 @@ from .utils import cartesian
 from mathutils import Euler, Quaternion, Matrix, Vector
 import bpy
 
+
 def interp(a, b, n, endpoint=True):
     """Interpolates between two frames.
 
@@ -35,13 +36,14 @@ def interp(a, b, n, endpoint=True):
 
     return frames
 
+
 class Sequence:
     def __init__(self, frames):
         """Initializes a sequence from a list of frames."""
         self.frames = frames
 
     @classmethod
-    def interpolated(this, waypoints, counts):
+    def interpolated(cls, waypoints, counts):
         """Creates a sequence interpolated from a list of waypoints.
 
         Args:
@@ -62,10 +64,10 @@ class Sequence:
         # add endpoint
         frames.append(waypoints[-1])
 
-        return this(frames)
+        return cls(frames)
 
     @classmethod
-    def exhaustive(this, *args, **kwargs):
+    def exhaustive(cls, *args, **kwargs):
         """Creates a sequence that includes every possible combination of the parameters given.
 
         The arguments to this constructor are the same as those to the ssi.Frame constructor, except instead of a single
@@ -101,7 +103,7 @@ class Sequence:
         frame_args = combos[:, :len(args)]
         frame_kwargs = [dict(zip(kwargs.keys(), combo[len(args):])) for combo in combos]
         # create a frame from each one and return
-        return this([Frame(*fargs, **fkwargs) for fargs, fkwargs in zip(frame_args, frame_kwargs)])
+        return cls([Frame(*fargs, **fkwargs) for fargs, fkwargs in zip(frame_args, frame_kwargs)])
 
     def bake(self, obj, camera, sun, scene=None, num=None):
         """
@@ -142,3 +144,9 @@ class Sequence:
 
     def __iter__(self):
         return iter(self.frames)
+
+    def __getitem__(self, i):
+        return self.frames[i]
+
+    def __setitem__(self, i, v):
+        self.frames[i] = v

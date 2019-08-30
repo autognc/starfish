@@ -15,4 +15,3 @@ Python library for automatically creating synthetic training data using Blender.
 
 ## Notes
 * This code has only been tested with Blender 2.8 beta.
-* There is a known issue with the `offset` parameter, in that it is sometimes slightly wrong (usually on the y-axis). This appears to be due to a bug in Blender's `Camera.angle_x` and `Camera.angle_y` attributes.
