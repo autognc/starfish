@@ -135,7 +135,7 @@ class Sequence:
         scene.frame_end = num
 
         for i, frame in enumerate(self.frames[::-(-len(self.frames) // num)]):
-            frame.setup(obj, camera, sun)
+            frame.setup(scene, obj, camera, sun)
             obj.keyframe_insert("location", frame=i + 1)
             obj.keyframe_insert("rotation_quaternion", frame=i + 1)
             camera.keyframe_insert("location", frame=i + 1)
