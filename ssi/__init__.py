@@ -1,2 +1,1 @@
-from .frame import Frame
-from .sequence import Sequence
+from .core import Frame, Sequence

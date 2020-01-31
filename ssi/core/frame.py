@@ -57,6 +57,7 @@ class Frame:
         """Sets up a camera, object, and sun into the picture-taking position.
 
         Args:
+            scene (BlendDataObject): the scene to perform the setup in
             obj (BlendDataObject): the object that will be the subject of the picture
             camera (BlendDataObject): the camera to take the picture with
             sun (BlendDataObject): the sun lamp that is providing the lighting

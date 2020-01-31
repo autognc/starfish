@@ -2,7 +2,6 @@ import numpy as np
 from .frame import Frame
 from .utils import cartesian
 from mathutils import Euler, Quaternion, Matrix, Vector
-import bpy
 
 
 def interp(a, b, n, endpoint=True):
@@ -105,7 +104,7 @@ class Sequence:
         # create a frame from each one and return
         return cls([Frame(*fargs, **fkwargs) for fargs, fkwargs in zip(frame_args, frame_kwargs)])
 
-    def bake(self, obj, camera, sun, scene=None, num=None):
+    def bake(self, scene, obj, camera, sun, num=None):
         """
         Creates keyframes representing this sequence, so that it can be played as a preview animation.  Keyframes will
         be adjacent to each other, so no interpolation will be done. This is just a means to get an idea of what frames
@@ -115,11 +114,10 @@ class Sequence:
         This should not be called with large values of `num` (>5000), as it is quite slow and may cause Blender to hang.
 
         Args:
+            scene (BlendDataObject): the scene to set up the animation in
             obj (BlendDataObject): the object that will be the subject of the picture
             camera (BlendDataObject): the camera to take the picture with
             sun (BlendDataObject): the sun lamp that is providing the lighting
-            scene (BlendDataObject): the scene to set up the animation in. If None, will use bpy.context.scene.
-                (default: None)
             num (int): The number of keyframes to generate. Defaults to min(100, len(frames))
         """
         if num is None:
@@ -129,8 +127,6 @@ class Sequence:
         camera.animation_data_clear()
         sun.animation_data_clear()
 
-        if scene is None:
-            scene = bpy.context.scene
         scene.frame_start = 1
         scene.frame_end = num
 

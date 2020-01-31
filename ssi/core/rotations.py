@@ -9,6 +9,7 @@ in order to be compatible with the rest of this library. A `from_other` classmet
 convert from a mathutils reprentation to the alternative representation.
 """
 
+
 class Spherical:
     """An alternative 3-value representation of a rotation based on spherical coordinates.
 
@@ -77,7 +78,6 @@ class Spherical:
         phi = np.arccos(np.clip(z_axis.z, -1, 1))
         roll = roll_quat.to_euler().z - theta
         return this(theta, phi, roll)
-
 
     def __matmul__(self, other):
         """
