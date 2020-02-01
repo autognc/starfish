@@ -1,1 +1,1 @@
-from .core import Frame, Sequence, rotations
+from .core import Frame, Sequence
