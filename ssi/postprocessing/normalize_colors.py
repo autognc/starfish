@@ -37,5 +37,5 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
     indices = np.argwhere(mask)[:, 2].reshape(mask.shape[:2])  # shape (w, h) of indices into colors
     result = colors[indices]
 
-    Image.fromarray(result.astype(np.uint8)).save(mask_path.replace('.png', '.norm.png'))
+    Image.fromarray(result.astype(np.uint8)).save(mask_path)
 
