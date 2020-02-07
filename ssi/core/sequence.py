@@ -1,6 +1,6 @@
 import numpy as np
 from .frame import Frame
-from .utils import cartesian
+from ssi.utils import cartesian
 from mathutils import Euler, Quaternion, Matrix, Vector
 
 
