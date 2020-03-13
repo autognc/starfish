@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 
 import numpy as np
 from mathutils import Quaternion, Vector
@@ -71,7 +72,7 @@ def jsonify(obj):
 
     All rotation objects are converted to wxyz quaternion form.
     """
-    d = vars(obj)
+    d = deepcopy(vars(obj))
     for key, value in d.items():
         # handle rotations
         try:

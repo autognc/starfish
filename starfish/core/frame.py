@@ -59,6 +59,11 @@ class Frame:
         self.background = Spherical.from_other(background)
 
     def dumps(self):
+        """
+        Converts all of the frame's attributes to a JSON object. By default, this will be the 6 frame parameters. Any
+        additional metadata can be added by just setting it as an attribute: e.g.
+        frame.sequence_name = '20k_square_earth_background'; metadata = frame.dumps()
+        """
         return jsonify(self)
 
     def setup(self, scene, obj, camera, sun):
