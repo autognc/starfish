@@ -1,7 +1,7 @@
 import numpy as np
 from mathutils import Quaternion, Vector
-from ssi.utils import to_quat, jsonify
-from ssi.rotations import Spherical
+from starfish.utils import to_quat, jsonify
+from starfish.rotations import Spherical
 
 
 class Frame:

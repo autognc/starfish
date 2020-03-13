@@ -1,6 +1,6 @@
 import bpy
-import ssi
-from ssi import utils
+import starfish
+from starfish import utils
 import time
 import os
 
@@ -8,7 +8,7 @@ import os
 def main():
     poses = utils.random_rotations(1000)
 
-    seq = ssi.Sequence.exhaustive(
+    seq = starfish.Sequence.exhaustive(
         pose=poses,
         distance=20
     )

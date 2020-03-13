@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
-setup(name='synthetic-spacecraft-imagery',
+setup(name='starfish',
       version='0.1.0',
       description='Create synthetic training data using Blender',
-      url='https://github.com/autognc/synthetic-spacecraft-imagery',
+      url='https://github.com/autognc/starfish',
       author='Kevin Black',
       license='MIT',
       packages=find_packages(),

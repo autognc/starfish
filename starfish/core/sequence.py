@@ -1,6 +1,6 @@
 import numpy as np
 from .frame import Frame
-from ssi.utils import cartesian
+from starfish.utils import cartesian
 from mathutils import Euler, Quaternion, Matrix, Vector
 
 
@@ -8,14 +8,14 @@ def interp(a, b, n, endpoint=True):
     """Interpolates between two frames.
 
     Args:
-        a (ssi.Frame): the first frame to interpolate from
-        b (ssi.Frame): the second frame to interpolate to
+        a (starfish.Frame): the first frame to interpolate from
+        b (starfish.Frame): the second frame to interpolate to
         n (int): the number of frames to generate
         endpoint (boolean): If True, frame b will be included in the result. Otherwise, it will be excluded. (default:
         True)
 
     Returns:
-        List of ssi.Frame objects
+        List of starfish.Frame objects
     """
     # each key is an argument to the Frame constructor
     lists = {
@@ -46,7 +46,7 @@ class Sequence:
         """Creates a sequence interpolated from a list of waypoints.
 
         Args:
-            waypoints (seq): A list of ssi.Frame objects representing the waypoints to interpolate between.
+            waypoints (seq): A list of starfish.Frame objects representing the waypoints to interpolate between.
             counts (int or seq): The number of frames to generate between each pair of waypoints. There will be
                 counts[i] frames in between waypoints[i] (inclusive) and waypoints[i+1] (exclusive). The total number of
                 frames in the sequence will be sum(counts) + 1.
@@ -69,7 +69,7 @@ class Sequence:
     def exhaustive(cls, *args, **kwargs):
         """Creates a sequence that includes every possible combination of the parameters given.
 
-        The arguments to this constructor are the same as those to the ssi.Frame constructor, except instead of a single
+        The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of a single
         value, each argument may also be a list of values. For example, while `position` is normally an iterable of
         length 3 representing a 3D vector, it could instead be a list of 3D vectors (e.g. an array of shape (n, 3)).
 
