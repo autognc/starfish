@@ -1,7 +1,8 @@
 import numpy as np
-from .frame import Frame
-from starfish.utils import cartesian
 from mathutils import Euler, Quaternion, Matrix, Vector
+
+from starfish.utils import cartesian
+from .frame import Frame
 
 
 def interp(a, b, n, endpoint=True):
@@ -23,8 +24,10 @@ def interp(a, b, n, endpoint=True):
         "distance": np.linspace(a.distance, b.distance, n, endpoint),
         "pose": [a.pose.slerp(b.pose, t) for t in np.linspace(0, 1, n, endpoint)],
         "lighting": [a.lighting.slerp(b.lighting, t) for t in np.linspace(0, 1, n, endpoint)],
-        "offset": [t for t in zip(np.linspace(a.offset[0], b.offset[0], n, endpoint), np.linspace(a.offset[1], b.offset[1], n, endpoint))],
-        "background": [a.background.to_quaternion().slerp(b.background.to_quaternion(), t) for t in np.linspace(0, 1, n, endpoint)]
+        "offset": [t for t in zip(np.linspace(a.offset[0], b.offset[0], n, endpoint),
+                                  np.linspace(a.offset[1], b.offset[1], n, endpoint))],
+        "background": [a.background.to_quaternion().slerp(b.background.to_quaternion(), t) for t in
+                       np.linspace(0, 1, n, endpoint)]
     }
 
     # creates Frames out of the dict of lists
@@ -46,7 +49,8 @@ class Sequence:
         """Creates a sequence interpolated from a list of waypoints.
 
         Args:
-            waypoints (seq): A list of starfish.Frame objects representing the waypoints to interpolate between.
+            waypoints (seq): A starfish.Sequence object (or just list of starfish.Frame objects) representing the
+                waypoints to interpolate between.
             counts (int or seq): The number of frames to generate between each pair of waypoints. There will be
                 counts[i] frames in between waypoints[i] (inclusive) and waypoints[i+1] (exclusive). The total number of
                 frames in the sequence will be sum(counts) + 1.
@@ -66,43 +70,26 @@ class Sequence:
         return cls(frames)
 
     @classmethod
-    def exhaustive(cls, *args, **kwargs):
+    def exhaustive(cls, **kwargs):
         """Creates a sequence that includes every possible combination of the parameters given.
 
-        The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of a single
-        value, each argument may also be a list of values. For example, while `position` is normally an iterable of
-        length 3 representing a 3D vector, it could instead be a list of 3D vectors (e.g. an array of shape (n, 3)).
+        The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of
+        a single value, each argument may also be a list of values. For example, while `position` is normally an
+        iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (e.g. an array of
+        shape (n, 3)).
 
         This constructor then takes the lists of values for each parameter and generates frames out of their cartesian
         product. For example, if 10 distances, 10 poses, and 10 offsets are provided, the generated sequence will be
         10*10*10 = 10,000 frames long, including every possible combination of given distances, poses, and offsets.
         """
         # if any parameter is a single value, turn it into a length-1 list
-        args = list(args)
-        for i, arg in enumerate(args):
-            try:
-                iter(arg)
-            except TypeError:
-                args[i] = [arg]
-            if type(arg) is Euler or type(arg) is Quaternion or type(arg) is Matrix or type(arg) is Vector:
-                args[i] = [arg]
-
-        for key, arg in kwargs.items():
-            try:
-                iter(arg)
-            except TypeError:
-                kwargs[key] = [arg]
-            if type(arg) is Euler or type(arg) is Quaternion or type(arg) is Matrix or type(arg) is Vector:
-                kwargs[key] = [arg]
+        kwargs = {k: cls._preprocess_arg(arg) for k, arg in kwargs.items()}
 
         # get cartesian product of all parameter lists
-        lists = args + list(kwargs.values())
-        combos = cartesian(*lists)
-        # split back into those that were args and those that were kwargs
-        frame_args = combos[:, :len(args)]
-        frame_kwargs = [dict(zip(kwargs.keys(), combo[len(args):])) for combo in combos]
+        combos = cartesian(*kwargs.values())
         # create a frame from each one and return
-        return cls([Frame(*fargs, **fkwargs) for fargs, fkwargs in zip(frame_args, frame_kwargs)])
+        frame_kwargs = [dict(zip(kwargs.keys(), combo)) for combo in combos]
+        return cls([Frame(**args) for args in frame_kwargs])
 
     def bake(self, scene, obj, camera, sun, num=None):
         """
@@ -137,6 +124,17 @@ class Sequence:
             camera.keyframe_insert("location", frame=i + 1)
             camera.keyframe_insert("rotation_quaternion", frame=i + 1)
             sun.keyframe_insert("rotation_quaternion", frame=i + 1)
+
+    @staticmethod
+    def _preprocess_arg(arg):
+        """Turn any non-iterable argument into a singleton list"""
+        if type(arg) in [Euler, Quaternion, Matrix, Vector]:
+            return [arg]
+        try:
+            iter(arg)
+            return arg
+        except TypeError:
+            return [arg]
 
     def __iter__(self):
         return iter(self.frames)

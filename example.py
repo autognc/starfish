@@ -1,8 +1,10 @@
+import os
+import time
+
 import bpy
+
 import starfish
 from starfish import utils
-import time
-import os
 
 
 def main():
@@ -16,7 +18,8 @@ def main():
     output_node = bpy.data.scenes["Render"].node_tree.nodes["File Output"]
     output_node.base_path = "/home/black/TSL/render"
     for i, frame in enumerate(seq):
-        frame.setup(bpy.data.scenes['Real'], bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"], bpy.data.objects["Sun"])
+        frame.setup(bpy.data.scenes['Real'], bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"],
+                    bpy.data.objects["Sun"])
 
         # add metadata to frame
         frame.timestamp = int(time.time() * 1000)

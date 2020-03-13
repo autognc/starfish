@@ -38,4 +38,3 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
     result = colors[indices]
 
     Image.fromarray(result.astype(np.uint8)).save(mask_path)
-

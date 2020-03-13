@@ -1,9 +1,12 @@
+import json
+
 import numpy as np
 from mathutils import Quaternion, Vector
-import json
+
 
 def to_quat(x):
     return x if type(x) is Quaternion else x.to_quaternion()
+
 
 def cartesian(*arrays):
     """Returns the cartesian product of multiple 1D arrays.
@@ -25,6 +28,7 @@ def cartesian(*arrays):
         cleaned[i] = subcleaned
     return np.stack(np.meshgrid(*cleaned), -1).reshape(-1, len(arrays))
 
+
 def random_rotations(n):
     """
     Generates n rotations sampled uniformly from the group of all 3D rotations, SO(3).
@@ -37,6 +41,7 @@ def random_rotations(n):
     """
     wxyz = [np.random.normal(size=n) for _ in range(4)]
     return [Quaternion(t).normalized() for t in zip(*wxyz)]
+
 
 def uniform_sphere(n, random=None):
     """
@@ -52,13 +57,14 @@ def uniform_sphere(n, random=None):
         A tuple of the form (theta, phi), where theta and phi are each numpy arrays of length n. theta is the azimuthal
         angle, and phi is the polar angle.
     """
-    indices = np.arange(0, n, dtype=np.float) + 0.5  # exclues start and endpoints while evenly spacing in between
+    indices = np.arange(0, n, dtype=np.float) + 0.5  # excludes start and endpoints while evenly spacing in between
     phi = np.arccos(2 * indices / n - 1)  # uniformly spaced along longitude lines
-    theta = np.pi * (1 + 5**0.5) * indices % (2 * np.pi)  # golden spiral down sphere
+    theta = np.pi * (1 + 5 ** 0.5) * indices % (2 * np.pi)  # golden spiral down sphere
     if random is None:
         return theta, phi
     else:
         return np.random.choice(theta, random), np.random.choice(theta, random)
+
 
 def jsonify(obj):
     """Serializes an object's attributes into a JSON string with support for mathutils rotation objects.

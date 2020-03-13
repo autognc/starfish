@@ -1,5 +1,6 @@
 import numpy as np
 from mathutils import Quaternion, Vector
+
 from .utils import to_quat
 
 """
@@ -80,16 +81,12 @@ class Spherical:
         return this(theta, phi, roll)
 
     def __matmul__(self, other):
-        """
-        Composes this rotation with another rotation object (Spherical, Euler, Quaternion, or Matrix).
-        """
+        """Composes this rotation with another rotation object (Spherical, Euler, Quaternion, or Matrix)."""
         other = to_quat(other)
         return Spherical.from_other(self.to_quaternion() @ other)
 
     def to_quaternion(self):
-        """
-        Returns a mathutils.Quaternion representation of the rotation.
-        """
+        """Returns a mathutils.Quaternion representation of the rotation."""
         # first, rotate about the +Z axis by the roll angle plus theta to align the +X axis with +phi and the +Y axis
         # with +theta
         roll_quat = Quaternion((0, 0, 1), self.roll + self.theta)
