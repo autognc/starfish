@@ -9,7 +9,8 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
     Blender has a bug where the colors in a mask image vary slightly (e.g. instead of the background
     being solid rgb(0, 0, 0) black, it will actually be a random mix of rgb(0, 0, 1), rgb(1, 1, 0), etc...).
     This function takes a mask path as well as a map of what the colors are supposed to be, then eliminates
-    this variation and saves a clean mask at the same path with the extension .norm.png.
+    this variation and saves a clean mask at the same path. For convenience, the normalized image is also
+    returned as a numpy array.
 
     Args:
         :param mask_path: path to mask image (str)
@@ -18,6 +19,7 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
             cityblock distance of no more than this value. The default value is 6, or equivalently 2 in each
             RGB channel. I chose this value because, in my experience with Blender 2.8,
             the color variation is no more than 1 in each channel, a number I then doubled to be safe.
+        :return: the normalized mask as a numpy array
     """
     colors = np.array(list(map(list, colors)))
     img = np.array(Image.open(mask_path))[..., :3]  # remove alpha channel
@@ -37,4 +39,6 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
     indices = np.argwhere(mask)[:, 2].reshape(mask.shape[:2])  # shape (w, h) of indices into colors
     result = colors[indices]
 
-    Image.fromarray(result.astype(np.uint8)).save(mask_path)
+    result = result.astype(np.uint8)
+    Image.fromarray(result).save(mask_path)
+    return result

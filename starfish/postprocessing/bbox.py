@@ -2,20 +2,25 @@ import numpy as np
 from PIL import Image
 
 
-def get_bounding_boxes_from_mask(mask_path, label_map):
+def get_bounding_boxes_from_mask(mask, label_map):
     """
     Gets bounding boxes from instance masks.
-    :param mask_path: path to mask image (str)
-    :param label_map: dictionary mapping classes (str) to their corresponding color (iterable of [R, G, B])
+    :param mask: path to mask image (str) or numpy array of mask image (RGB)
+    :param label_map: dictionary mapping classes (str) to their corresponding color(s). Each class can correspond to a
+        single color (e.g. {"cygnus": (0, 0, 206)}) or multiple colors (e.g. {"cygnus": [(0, 0, 206), (206, 0, 0)]})
     :return: a dictionary mapping classes (str) to their corresponding
         bboxes (a dictionary with the keys 'xmin', 'xmax', 'ymin', 'ymax'). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
-    img = np.array(Image.open(mask_path))[..., :3]  # remove alpha channel
+    if type(mask) is not np.ndarray:
+        mask = np.array(Image.open(mask))[..., :3]  # remove alpha channel
     bboxes = {}
-    for class_name, color in label_map.items():
-        color = np.array(list(color))
-        class_mask = np.all(img == color, axis=-1)
+    for class_name, colors in label_map.items():
+        colors = np.array(list(colors))
+        # if a single color is provided, turn it into a list of length 1
+        if len(colors.shape) == 1:
+            colors = [None, ...]
+        class_mask = np.any(np.all(mask[:, :, None, :] == colors, axis=-1), axis=-1)
         ys, xs = class_mask.nonzero()
         if len(ys) > 0:
             bboxes[class_name] = {
@@ -27,20 +32,25 @@ def get_bounding_boxes_from_mask(mask_path, label_map):
     return bboxes
 
 
-def get_centroids_from_mask(mask_path, label_map):
+def get_centroids_from_mask(mask, label_map):
     """
     Gets bounding boxes from instance masks.
-    :param mask_path: path to mask image (str)
-    :param label_map: dictionary mapping classes (str) to their corresponding color (iterable of [R, G, B])
+    :param mask: path to mask image (str) or numpy array of mask image (RGB)
+    :param label_map: dictionary mapping classes (str) to their corresponding color(s). Each class can correspond to a
+        single color (e.g. {"cygnus": (0, 0, 206)}) or multiple colors (e.g. {"cygnus": [(0, 0, 206), (206, 0, 0)]})
     :return: a dictionary mapping classes (str) to their corresponding
         centroids (y, x). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
-    img = np.array(Image.open(mask_path))[..., :3]  # remove alpha channel
+    if type(mask) is not np.ndarray:
+        mask = np.array(Image.open(mask))[..., :3]  # remove alpha channel
     centroids = {}
-    for class_name, color in label_map.items():
-        color = np.array(list(color))
-        class_mask = np.all(img == color, axis=-1)
+    for class_name, colors in label_map.items():
+        colors = np.array(list(colors))
+        # if a single color is provided, turn it into a list of length 1
+        if len(colors.shape) == 1:
+            colors = [None, ...]
+        class_mask = np.any(np.all(mask[:, :, None, :] == colors, axis=-1), axis=-1)
         ys, xs = class_mask.nonzero()
         if len(ys) > 0:
             centroids[class_name] = (int(np.mean(ys)), int(np.mean(xs)))
