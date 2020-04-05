@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image
+import cv2
 
 
 def get_bounding_boxes_from_mask(mask, label_map):
@@ -13,7 +13,7 @@ def get_bounding_boxes_from_mask(mask, label_map):
         then it will not appear in the keys of the returned dictionary.
     """
     if type(mask) is not np.ndarray:
-        mask = np.array(Image.open(mask))[..., :3]  # remove alpha channel
+        mask = cv2.imread(mask)
     bboxes = {}
     for class_name, colors in label_map.items():
         colors = np.array(list(colors))
@@ -43,7 +43,7 @@ def get_centroids_from_mask(mask, label_map):
         then it will not appear in the keys of the returned dictionary.
     """
     if type(mask) is not np.ndarray:
-        mask = np.array(Image.open(mask))[..., :3]  # remove alpha channel
+        mask = cv2.imread(mask)
     centroids = {}
     for class_name, colors in label_map.items():
         colors = np.array(list(colors))

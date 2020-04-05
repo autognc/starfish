@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image
+import cv2
 
 
 def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
@@ -22,7 +22,7 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
         :return: the normalized mask as a numpy array
     """
     colors = np.array(list(map(list, colors)))
-    img = np.array(Image.open(mask_path))[..., :3]  # remove alpha channel
+    img = cv2.imread(mask_path)
 
     # shape (w, h, len(colors)) of cityblock distance from each pixel to each color
     distances = np.absolute(img[:, :, None, :] - colors).sum(axis=3)
@@ -40,5 +40,5 @@ def normalize_mask_colors(mask_path, colors, color_variation_cutoff=6):
     result = colors[indices]
 
     result = result.astype(np.uint8)
-    Image.fromarray(result).save(mask_path)
+    cv2.imwrite(mask_path, result)
     return result
