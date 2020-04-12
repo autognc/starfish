@@ -12,14 +12,14 @@ def get_bounding_boxes_from_mask(mask, label_map):
         bboxes (a dictionary with the keys 'xmin', 'xmax', 'ymin', 'ymax'). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
-    if type(mask) is not np.ndarray:
-        mask = cv2.imread(mask)
+    if isinstance(mask, str):
+        mask = cv2.cvtColor(cv2.imread(mask), cv2.COLOR_BGR2RGB)
     bboxes = {}
     for class_name, colors in label_map.items():
         colors = np.array(list(colors))
         # if a single color is provided, turn it into a list of length 1
         if len(colors.shape) == 1:
-            colors = [None, ...]
+            colors = colors[None, ...]
         class_mask = np.any(np.all(mask[:, :, None, :] == colors, axis=-1), axis=-1)
         ys, xs = class_mask.nonzero()
         if len(ys) > 0:
@@ -42,14 +42,14 @@ def get_centroids_from_mask(mask, label_map):
         centroids (y, x). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
-    if type(mask) is not np.ndarray:
-        mask = cv2.imread(mask)
+    if isinstance(mask, str):
+        mask = cv2.cvtColor(cv2.imread(mask), cv2.COLOR_BGR2RGB)
     centroids = {}
     for class_name, colors in label_map.items():
         colors = np.array(list(colors))
         # if a single color is provided, turn it into a list of length 1
         if len(colors.shape) == 1:
-            colors = [None, ...]
+            colors = colors[None, ...]
         class_mask = np.any(np.all(mask[:, :, None, :] == colors, axis=-1), axis=-1)
         ys, xs = class_mask.nonzero()
         if len(ys) > 0:

@@ -7,7 +7,7 @@ from .utils import to_quat
 This module is for alternative 3D rotation formalisms besides the Quaternion, Matrix, and Euler representations provided
 by the mathutils library. They must implement the `to_quaternion` method, which returns a mathutils.Quaternion instance,
 in order to be compatible with the rest of this library. A `from_other` classmethod may also be useful, in order to
-convert from a mathutils reprentation to the alternative representation.
+convert from a mathutils representation to the alternative representation.
 """
 
 
@@ -57,11 +57,11 @@ class Spherical:
         self.roll = roll % (2 * np.pi)
 
     @classmethod
-    def from_other(this, obj):
+    def from_other(cls, obj):
         """
         Constructs a Spherical object from a Quaternion, Euler, or Matrix rotation object from the mathutils library.
         """
-        if type(obj) is this:
+        if type(obj) is cls:
             return obj
         obj = to_quat(obj)
 
@@ -78,12 +78,7 @@ class Spherical:
         theta = np.arctan2(z_axis.y, z_axis.x)
         phi = np.arccos(np.clip(z_axis.z, -1, 1))
         roll = roll_quat.to_euler().z - theta
-        return this(theta, phi, roll)
-
-    def __matmul__(self, other):
-        """Composes this rotation with another rotation object (Spherical, Euler, Quaternion, or Matrix)."""
-        other = to_quat(other)
-        return Spherical.from_other(self.to_quaternion() @ other)
+        return cls(theta, phi, roll)
 
     def to_quaternion(self):
         """Returns a mathutils.Quaternion representation of the rotation."""
@@ -96,6 +91,9 @@ class Spherical:
         rot_quat = Quaternion(theta_tangent, self.phi)
         # compose the two rotations and return
         return rot_quat @ roll_quat
+
+    def __eq__(self, other):
+        return self.theta == other.theta and self.phi == other.phi and self.roll == other.roll
 
     def __repr__(self):
         return f"<Spherical (theta={self.theta}, phi={self.phi}, roll={self.roll})>"

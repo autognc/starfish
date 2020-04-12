@@ -68,20 +68,24 @@ class Sequence:
 
         The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of
         a single value, each argument may also be a list of values. For example, while `position` is normally an
-        iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (e.g. an array of
+        iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (i.e. an array of
         shape (n, 3)).
 
         This constructor then generates a list of frames where the parameters for each frame come from these lists,
         zipped together.
 
-        Each list of parameters must be either the same length as all the others, or be a single value. If a single
-        value is provided for a parameter, then that value is broadcasted across all the frames, i.e. every frame gets
-        that value for that parameter. (The same thing happens if a parameter is omitted: every frame gets the default
-        value for that parameter).
-        """
-        # if any parameter is a single value, turn it into a length-1 list
-        kwargs = {k: cls._preprocess_arg(v) for k, v in kwargs.items()}
+        Each list of parameters must be either the same length as all the others, or be list with a single value. If
+        a single value is provided for a parameter, then that value is broadcasted across all the frames, i.e. every
+        frame gets that value for that parameter. (The same thing happens if a parameter is omitted: every frame gets
+        the default value for that parameter).
 
+        For example: Sequence(distance=[100, 200, 300]) will generate a sequence of 3 frames where the distances are
+        100, 200, and 300, while all other parameters are the default. Sequence(position=[(1, 1, 1)], distance=[100,
+        200, 300]) will generate a sequence of 3 frames where the distances are 100, 200, and 300, while the position
+        is always (1, 1, 1) and all other parameters are the default.
+        """
+        if not all(isinstance(v, list) for v in kwargs.values()):
+            raise ValueError('Non-list argument provided')
         kwargs_multi = {k: v for k, v in kwargs.items() if len(v) > 1}
         if kwargs_multi:
             lengths = list(map(len, kwargs_multi.values()))
@@ -133,15 +137,18 @@ class Sequence:
 
         The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of
         a single value, each argument may also be a list of values. For example, while `position` is normally an
-        iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (e.g. an array of
+        iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (i.e. an array of
         shape (n, 3)).
 
         This constructor then takes the lists of values for each parameter and generates frames out of their cartesian
         product. For example, if 10 distances, 10 poses, and 10 offsets are provided, the generated sequence will be
         10*10*10 = 10,000 frames long, including every possible combination of given distances, poses, and offsets.
         """
-        # if any parameter is a single value, turn it into a length-1 list
-        kwargs = {k: cls._preprocess_arg(v) for k, v in kwargs.items()}
+        if not all(isinstance(v, list) for v in kwargs.values()):
+            raise ValueError('Non-list argument provided')
+
+        if not kwargs:
+            return cls([Frame()])
 
         # get cartesian product of all parameter lists
         combos = cartesian(*kwargs.values())
@@ -183,17 +190,6 @@ class Sequence:
             camera.keyframe_insert("rotation_quaternion", frame=i + 1)
             sun.keyframe_insert("rotation_quaternion", frame=i + 1)
 
-    @staticmethod
-    def _preprocess_arg(arg):
-        """Turn any non-iterable argument into a singleton list"""
-        if type(arg) in [Euler, Quaternion, Matrix, Vector]:
-            return [arg]
-        try:
-            iter(arg)
-            return arg
-        except TypeError:
-            return [arg]
-
     def __len__(self):
         return len(self.frames)
 
@@ -208,3 +204,6 @@ class Sequence:
 
     def __delitem__(self, key):
         del self.frames[key]
+
+    def __add__(self, other):
+        return self.frames + other.frames

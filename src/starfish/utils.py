@@ -68,18 +68,27 @@ def uniform_sphere(n, random=None):
 
 
 def jsonify(obj):
-    """Serializes an object's attributes into a JSON string with support for mathutils rotation objects.
+    """Serializes an object's attributes into a JSON string with support for mathutils objects.
 
-    All rotation objects are converted to wxyz quaternion form.
+    All rotation objects are converted to a 4-element list representing wxyz quaternion form.
+    All vectors are converted to a 3-element list.
     """
-    d = deepcopy(vars(obj))
-    for key, value in d.items():
+    def recursive_handle(value):
+        if isinstance(value, str):
+            return value
+        if isinstance(value, dict):
+            return {k: recursive_handle(v) for k, v in value.items()}
         # handle rotations
         try:
-            value = to_quat(value)
-            d[key] = list(value)
+            return list(to_quat(value))
         except AttributeError:
-            if type(value) is Vector:
-                d[key] = list(value)
+            # handle vectors
+            if isinstance(value, Vector):
+                return list(value)
+        # handle any other iterable
+        try:
+            return [recursive_handle(v) for v in value]
+        except TypeError:
+            return value
 
-    return json.dumps(d, indent=4)
+    return json.dumps(recursive_handle(vars(obj)), indent=4)
