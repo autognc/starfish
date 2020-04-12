@@ -1,0 +1,6 @@
+numpy~=1.16.1
+opencv-python~=4.2.0
+mathutils~=2.81.2
+pytest~=5.4.1
+pytest-repeat~=0.8.0
+pre-commit~=2.2.0

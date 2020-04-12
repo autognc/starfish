@@ -1,5 +1,4 @@
 import json
-from copy import deepcopy
 
 import numpy as np
 from mathutils import Quaternion, Vector

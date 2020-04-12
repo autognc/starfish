@@ -1,6 +1,5 @@
 import numpy as np
 from copy import deepcopy
-from mathutils import Euler, Quaternion, Matrix, Vector
 
 from starfish.utils import cartesian
 from .frame import Frame

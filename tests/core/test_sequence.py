@@ -131,4 +131,3 @@ class TestSequence:
                 Frame(distance=2, position=(1, 1, 2), pose=Quaternion([1, 1, 1, 1])),
             ]
         )
-
