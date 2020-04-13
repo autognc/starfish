@@ -10,13 +10,15 @@ def to_quat(x):
 
 def cartesian(*arrays):
     """Returns the cartesian product of multiple 1D arrays.
-    For example, cartesian([0], [1, 2], [3, 4, 5]) returns:
-    array([[0, 1, 3],
-           [0, 1, 4],
-           [0, 1, 5],
-           [0, 2, 3],
-           [0, 2, 4],
-           [0, 2, 5]])
+    For example, ``cartesian([0], [1, 2], [3, 4, 5])`` returns::
+
+        array([[0, 1, 3],
+               [0, 1, 4],
+               [0, 1, 5],
+               [0, 2, 3],
+               [0, 2, 4],
+               [0, 2, 5]])
+
     Works with arbitrary objects.
     """
     # must do it this way to prevent numpy from turning any iterable into an np.array
@@ -30,14 +32,11 @@ def cartesian(*arrays):
 
 
 def random_rotations(n):
-    """
-    Generates n rotations sampled uniformly from the group of all 3D rotations, SO(3).
+    """Generates n rotations sampled uniformly from the group of all 3D rotations, SO(3).
 
-    Args:
-        n (int): number of rotations to generate
+    :param n: (int): number of rotations to generate
 
-    Returns:
-        List of mathutils.Quaternion objects.
+    :returns: List of `mathutils.Quaternion` objects.
     """
     wxyz = [np.random.normal(size=n) for _ in range(4)]
     return [Quaternion(t).normalized() for t in zip(*wxyz)]
@@ -48,14 +47,12 @@ def uniform_sphere(n, random=None):
     Generates n points on the surface of a sphere that are "evenly spaced" using the golden spiral method. Based on
     https://stackoverflow.com/a/44164075.
 
-    Args:
-        n (int): number of points to generate over the surface of the sphere
-        random (int): if None, return all generated points. Otherwise, randomly sample this many points from the
-            generated ones (default: None)
+    :param n: (int): number of points to generate over the surface of the sphere
+    :param random: (int): if None, return all generated points. Otherwise, randomly sample this many points from the
+        generated ones (default: None)
 
-    Returns:
-        A tuple of the form (theta, phi), where theta and phi are each numpy arrays of length n. theta is the azimuthal
-        angle, and phi is the polar angle.
+    :returns: A tuple of the form (theta, phi), where theta and phi are each numpy arrays of length n. theta is the
+        azimuthal angle, and phi is the polar angle.
     """
     indices = np.arange(0, n, dtype=np.float) + 0.5  # excludes start and endpoints while evenly spacing in between
     phi = np.arccos(2 * indices / n - 1)  # uniformly spaced along longitude lines

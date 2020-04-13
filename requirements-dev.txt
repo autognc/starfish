@@ -4,3 +4,5 @@ mathutils~=2.81.2
 pytest~=5.4.1
 pytest-repeat~=0.8.0
 pre-commit~=2.2.0
+sphinx~=3.0.1
+sphinx-rtd-theme~=0.4.3

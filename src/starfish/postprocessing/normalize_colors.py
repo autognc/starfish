@@ -15,14 +15,13 @@ def normalize_mask_colors(mask, colors, color_variation_cutoff=6):
     is provided, then the function will return the normalized mask as well as overwrite the original mask on disk.
     If a numpy array is provided, then the function will just return the normalized mask.
 
-    Args:
-        :param mask: path to mask image (str) or numpy array of mask image (RGB)
-        :param colors: a list of what the label colors are supposed to be, each in [R, G, B] format
-        :param color_variation_cutoff:  colors will be allowed to differ from a color in the label map by a
-            cityblock distance of no more than this value. The default value is 6, or equivalently 2 in each
-            RGB channel. I chose this value because, in my experience with Blender 2.8,
-            the color variation is no more than 1 in each channel, a number I then doubled to be safe.
-        :return: the normalized mask as a numpy array
+    :param mask: path to mask image (str) or numpy array of mask image (RGB)
+    :param colors: a list of what the label colors are supposed to be, each in [R, G, B] format
+    :param color_variation_cutoff:  colors will be allowed to differ from a color in the label map by a
+        cityblock distance of no more than this value. The default value is 6, or equivalently 2 in each
+        RGB channel. I chose this value because, in my experience with Blender 2.8,
+        the color variation is no more than 1 in each channel, a number I then doubled to be safe.
+    :returns: the normalized mask as a numpy array
     """
     mask_path = None
     if isinstance(mask, str):

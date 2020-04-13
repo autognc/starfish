@@ -1,41 +1,59 @@
-import os
 import time
-
 import bpy
+import numpy as np
+from mathutils import Euler
+from starfish import Sequence
+from starfish.utils import random_rotations
+from starfish.postprocessing import normalize_mask_colors, get_centroids_from_mask, get_bounding_boxes_from_mask
 
-import starfish
-from starfish import utils
+# create a standard sequence of random configurations...
+seq = Sequence.standard(
+    pose=random_rotations(1000),
+    lighting=random_rotations(1000),
+    background=random_rotations(1000),
+    distance=np.linspace(10, 50, num=1000)
+)
+# ...or an exhaustive sequence of combinations...
+seq = Sequence.exhaustive(
+    distance=[10, 20, 30],
+    offset=[(0.25, 0.25), (0.25, 0.75), (0.75, 0.25), (0.75, 0.75)],
+    pose=[Euler((0, 0, 0)), Euler((np.pi, 0, 0))]
+)
+# ...or an interpolated sequence between keyframes...
+seq = Sequence.interpolated(
+    waypoints=Sequence.standard(distance=[10, 20], pose=[Euler((0, 0, 0)), Euler((0, np.pi, np.pi))]),
+    counts=[100]
+)
 
+for i, frame in enumerate(seq):
+    # non-starfish Blender stuff: e.g. setting file output paths
+    bpy.data.scenes['Real'].node_tree.nodes['File Output'].file_slots[0].path = f'real_{i}.png'
+    bpy.data.scenes['Mask'].node_tree.nodes['File Output'].file_slots[0].path = f'mask_{i}.png'
 
-def main():
-    poses = utils.random_rotations(1000)
+    # set up and render
+    scene = bpy.data.scenes['Real']
+    frame.setup(scene, bpy.data.objects['MyObject'],
+                bpy.data.objects['MyCamera'], bpy.data.objects['TheSun'])
+    bpy.ops.render.render(scene=scene)
 
-    seq = starfish.Sequence.exhaustive(
-        pose=poses,
-        distance=20
-    )
+    scene = bpy.data.scenes['Mask']
+    frame.setup(scene, bpy.data.objects['MyObject'],
+                bpy.data.objects['MyCamera'], bpy.data.objects['TheSun'])
+    bpy.ops.render.render(scene=scene)
 
-    output_node = bpy.data.scenes["Render"].node_tree.nodes["File Output"]
-    output_node.base_path = "/home/black/TSL/render"
-    for i, frame in enumerate(seq):
-        frame.setup(bpy.data.scenes['Real'], bpy.data.objects["Enhanced Cygnus"], bpy.data.objects["Camera"],
-                    bpy.data.objects["Sun"])
+    # postprocessing
+    label_map = {'object': (255, 255, 255), 'background': (0, 0, 0)}
+    clean_mask = normalize_mask_colors(f'mask_{i}.png', label_map.values())
+    bboxes = get_bounding_boxes_from_mask(clean_mask, label_map)
+    centroids = get_centroids_from_mask(clean_mask, label_map)
 
-        # add metadata to frame
-        frame.timestamp = int(time.time() * 1000)
-        frame.sequence_name = "1000 random poses"
+    # add some extra metadata
+    frame.timestamp = int(time.time() * 1000)
+    frame.sequence_name = '1000 random poses'
+    frame.tags = ['front_view', 'left_view', 'right_view']
+    frame.bboxes = bboxes
+    frame.centroids = centroids
 
-        # set output path
-        output_node.file_slots[0].path = f"real#_{i}"
-        output_node.file_slots[1].path = f"mask#_{i}"
-
-        # dump data to json
-        with open(os.path.join(output_node.base_path, f"{i}.json"), "w") as f:
-            f.write(frame.dumps())
-
-        # render
-        bpy.ops.render.render(scene="Render")
-
-
-if __name__ == "__main__":
-    main()
+    # save metadata to JSON
+    with open(f'meta_{i}.json', 'w') as f:
+        f.write(frame.dumps())

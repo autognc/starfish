@@ -1,14 +1,14 @@
+"""
+This module is for alternative 3D rotation formalisms besides the Quaternion, Matrix, and Euler representations provided
+by the `mathutils` library. They must implement the ``to_quaternion`` method, which returns a `mathutils.Quaternion`
+instance, in order to be compatible with the rest of this library. A ``from_other`` classmethod may also be useful,
+in order to convert from a mathutils representation to the alternative representation.
+"""
+
 import numpy as np
 from mathutils import Quaternion, Vector
 
 from .utils import to_quat
-
-"""
-This module is for alternative 3D rotation formalisms besides the Quaternion, Matrix, and Euler representations provided
-by the mathutils library. They must implement the `to_quaternion` method, which returns a mathutils.Quaternion instance,
-in order to be compatible with the rest of this library. A `from_other` classmethod may also be useful, in order to
-convert from a mathutils representation to the alternative representation.
-"""
 
 
 class Spherical:
@@ -38,19 +38,19 @@ class Spherical:
     the roll angle are redundant (only their sum matters).
 
     Attributes:
-        theta: The azimuthal angle, in radians
-        phi: The polar angle, in radians (0 at the north pole, pi at the south pole)
-        roll: The roll angle, in radians
+
+    * theta: The azimuthal angle, in radians
+    * phi: The polar angle, in radians (0 at the north pole, pi at the south pole)
+    * roll: The roll angle, in radians
     """
 
     def __init__(self, theta, phi, roll):
         """
         Initializes a spherical rotation object.
 
-        Args:
-            theta: The azimuthal angle, in radians
-            phi: The polar angle, in radians (0 at the north pole, pi at the south pole)
-            roll: The roll angle, in radians
+        :param theta: The azimuthal angle, in radians
+        :param phi: The polar angle, in radians (0 at the north pole, pi at the south pole)
+        :param roll: The roll angle, in radians
         """
         self.theta = theta % (2 * np.pi)
         self.phi = phi % (2 * np.pi)
@@ -58,8 +58,7 @@ class Spherical:
 
     @classmethod
     def from_other(cls, obj):
-        """
-        Constructs a Spherical object from a Quaternion, Euler, or Matrix rotation object from the mathutils library.
+        """Constructs a Spherical object from a Quaternion, Euler, or Matrix rotation object from the mathutils library.
         """
         if type(obj) is cls:
             return obj
@@ -81,7 +80,7 @@ class Spherical:
         return cls(theta, phi, roll)
 
     def to_quaternion(self):
-        """Returns a mathutils.Quaternion representation of the rotation."""
+        """Returns a `mathutils.Quaternion` representation of the rotation."""
         # first, rotate about the +Z axis by the roll angle plus theta to align the +X axis with +phi and the +Y axis
         # with +theta
         roll_quat = Quaternion((0, 0, 1), self.roll + self.theta)

@@ -9,47 +9,47 @@ class Frame:
     """Represents a single picture of an object with certain parameters.
 
     There are 6 parameters that independently define a picture:
-        1. Object position: the absolute 3D position of the object in the global coordinate system (i.e. where it is in
-           the scene).
-        2. Camera distance: the distance of the camera from the object.
-        3. Object pose: the pose of the object relative to the camera (i.e. how it will appear to be oriented in the
-           picture).
-        4. Lighting: the angle from which the sun's rays will hit the object in the picture (e.g. from above, from the
-           right, from behind the camera, etc.).
-        5. Object offset: the 2D translational offset of the object from the center of the picture frame.
-        6. Background/camera orientation: the orientation of the camera and object relative to the global coordinate
-           system. This affects only what part of the scene appears in the background directly behind the object.
+
+    * Object position: the absolute 3D position of the object in the global coordinate system (i.e. where it is in
+      the scene).
+    * Camera distance: the distance of the camera from the object.
+    * Object pose: the pose of the object relative to the camera (i.e. how it will appear to be oriented in the
+      picture).
+    * Lighting: the angle from which the sun's rays will hit the object in the picture (e.g. from above, from the
+      right, from behind the camera, etc.).
+    * Object offset: the 2D translational offset of the object from the center of the picture frame.
+    * Background/camera orientation: the orientation of the camera and object relative to the global coordinate
+      system. This affects only what part of the scene appears in the background directly behind the object.
     """
 
     def __init__(self, *, position=(0, 0, 0), distance=100, pose=Quaternion(),
                  lighting=Quaternion(), offset=(0.5, 0.5), background=Quaternion()):
         """Initializes a picture with all of the parameters it needs.
 
-        A type of "rotation" means a mathutils.Quaternion object or any object with a to_quaternion() method (which
-        includes mathutils.Euler and mathutils.Matrix).
+        A type of "rotation" means a `mathutils.Quaternion` object or any object with a to_quaternion() method (which
+        includes `mathutils.Euler`, `mathutils.Matrix`, and `starfish.rotations.Spherical`).
 
-        Args:
-            position (seq, len 3): the (x, y, z) absolute position of the object in the scene's global coordinate system
-                (default: (0, 0, 0))
-            distance (float or int): the distance of the camera from the object in blender units (default: 100)
-            pose (rotation): the orientation of the object relative to the camera's coordinate system (default: the
-                identity quaternion (aka zero rotation), which corresponds to the camera looking directly in the
-                object's -Z direction with the object's +X direction pointing up and +Y pointing to the right)
-            lighting (rotation): the angle of the sun's lighting relative to the camera's coordinate system (default:
-                the identity quaternion (aka zero rotation), which corresponds to the light coming from directly
-                behind the camera)
-            offset (seq of float, len 2): the (horizontal, vertical) translational offset of the object from the center
-                of the picture frame. Expressed as a fraction of the distance from edge to edge: e.g., for horizontal
-                offset, 0.0 is the left edge, 0.5 is the center, and 1.0 is the right edge. Same for vertical,
-                but 0.0 is the bottom edge and 1.0 is the top. (default: (0.5, 0.5))
-            background (rotation): Imagine a ray starting at the camera and passing through the object. This parameter
-                determines the orientation of this ray in the global coordinate system. For example, if you have a world
-                background image that encircles your entire scene, two degrees of freedom of this parameter will
-                determine the point in the background image that will appear directly behind the object,
-                and the third degree of freedom will determine the rotation of this background image (i.e. which way
-                is 'up'). (default: the identity quaternion (aka zero rotation), which corresponds to the
-                camera->object ray pointing directly in the -Z direction with the +X direction pointing up and +Y
-                pointing to the right)
+        :param position: (seq, len 3): the (x, y, z) absolute position of the object in the scene's global coordinate
+            system (default: (0, 0, 0))
+        :param distance: (float or int): the distance of the camera from the object in blender units (default: 100)
+        :param pose: (rotation): the orientation of the object relative to the camera's coordinate system (default: the
+            identity quaternion (aka zero rotation), which corresponds to the camera looking directly in the
+            object's -Z direction with the object's +X direction pointing up and +Y pointing to the right)
+        :param lighting: (rotation): the angle of the sun's lighting relative to the camera's coordinate system (
+        default: the identity quaternion (aka zero rotation), which corresponds to the light coming from directly
+        behind the camera)
+        :param offset: (seq of float, len 2): the (horizontal, vertical) translational offset of the object from the
+            center of the picture frame. Expressed as a fraction of the distance from edge to edge: e.g., for horizontal
+            offset, 0.0 is the left edge, 0.5 is the center, and 1.0 is the right edge. Same for vertical,
+            but 0.0 is the bottom edge and 1.0 is the top. (default: (0.5, 0.5))
+        :param background: (rotation): Imagine a ray starting at the camera and passing through the object. This
+            parameter determines the orientation of this ray in the global coordinate system. For example, if you have a
+            world background image that encircles your entire scene, two degrees of freedom of this parameter will
+            determine the point in the background image that will appear directly behind the object,
+            and the third degree of freedom will determine the rotation of this background image (i.e. which way is
+            'up'). (default: the identity quaternion (aka zero rotation), which corresponds to the
+            camera->object ray pointing directly in the -Z direction with the +X direction pointing up and +Y
+            pointing to the right)
         """
         self.position = Vector(position)
         self.distance = distance
@@ -62,21 +62,20 @@ class Frame:
         """
         Converts all of the frame's attributes to a JSON object. By default, this will be the 6 frame parameters. Any
         additional metadata can be added by just setting it as an attribute: e.g.
-        frame.sequence_name = '20k_square_earth_background'; metadata = frame.dumps()
+        ``frame.sequence_name = '20k_square_earth_background'; metadata = frame.dumps()``
         """
         return jsonify(self)
 
     def setup(self, scene, obj, camera, sun):
         """Sets up a camera, object, and sun into the picture-taking position.
 
-        Args:
-            scene (BlendDataObject): the scene to use for aspect ratio calculations. Note that this should be the scene
-                that you intend to perform the final render in, not necessarily the one that your objects exist in.
-                If you render in a scene that has an output resolution with a different aspect ratio than the output
-                resolution of this scene, then the offset of the object may be incorrect.
-            obj (BlendDataObject): the object that will be the subject of the picture
-            camera (BlendDataObject): the camera to take the picture with
-            sun (BlendDataObject): the sun lamp that is providing the lighting
+        :param scene: (BlendDataObject): the scene to use for aspect ratio calculations. Note that this should be the
+            scene that you intend to perform the final render in, not necessarily the one that your objects exist in. If
+            you render in a scene that has an output resolution with a different aspect ratio than the output
+            resolution of this scene, then the offset of the object may be incorrect.
+        :param obj: (BlendDataObject): the object that will be the subject of the picture
+        :param camera: (BlendDataObject): the camera to take the picture with
+        :param sun: (BlendDataObject): the sun lamp that is providing the lighting
         """
         # set object position
         obj.location = self.position

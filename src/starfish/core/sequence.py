@@ -8,15 +8,13 @@ from .frame import Frame
 def interp(a, b, n, endpoint=True):
     """Interpolates between two frames.
 
-    Args:
-        a (starfish.Frame): the first frame to interpolate from
-        b (starfish.Frame): the second frame to interpolate to
-        n (int): the number of frames to generate
+    :param a: (starfish.Frame): the first frame to interpolate from
+    :param b: (starfish.Frame): the second frame to interpolate to
+    :param n: (int): the number of frames to generate
         endpoint (boolean): If True, frame b will be included in the result. Otherwise, it will be excluded. (default:
         True)
 
-    Returns:
-        List of starfish.Frame objects
+    :returns: List of starfish.Frame objects
     """
     # each key is an argument to the Frame constructor
     lists = {
@@ -40,8 +38,7 @@ def interp(a, b, n, endpoint=True):
 
 
 class Sequence:
-    """
-    Represents a sequence of frames.
+    """Represents a sequence of frames.
 
     This class acts exactly like a list of starfish.Frame objects, with a few utility methods tacked on.
 
@@ -50,7 +47,7 @@ class Sequence:
 
     The bake method is useful for previewing sequences in Blender while they are being tweaked and configured, in order
     to get an idea of what they will look like before rendering. However, it is not recommended to use bake at render
-    time. Instead, the sequence object can be iterated over frame-by-frame, like so:
+    time. Instead, the sequence object can be iterated over frame-by-frame, like so::
 
         for frame in sequence:
             frame.setup(...)
@@ -65,8 +62,8 @@ class Sequence:
     def standard(cls, **kwargs):
         """Creates a sequence from parameters that are lists.
 
-        The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of
-        a single value, each argument may also be a list of values. For example, while `position` is normally an
+        The arguments to this constructor are the same as those to the `Frame` constructor, except instead of
+        a single value, each argument may also be a list of values. For example, while ``position`` is normally an
         iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (i.e. an array of
         shape (n, 3)).
 
@@ -78,10 +75,12 @@ class Sequence:
         frame gets that value for that parameter. (The same thing happens if a parameter is omitted: every frame gets
         the default value for that parameter).
 
-        For example: Sequence(distance=[100, 200, 300]) will generate a sequence of 3 frames where the distances are
-        100, 200, and 300, while all other parameters are the default. Sequence(position=[(1, 1, 1)], distance=[100,
-        200, 300]) will generate a sequence of 3 frames where the distances are 100, 200, and 300, while the position
-        is always (1, 1, 1) and all other parameters are the default.
+        For example: ``Sequence(distance=[100, 200, 300])`` will generate a sequence of 3 frames where the distances are
+        100, 200, and 300, while all other parameters are the default.
+        ``Sequence(position=[(1, 1, 1)], distance=[100, 200, 300])`` will generate a sequence of 3 frames where the
+        distances are 100, 200, and 300, while the positions are (1, 1, 1) and all other parameters are the default.
+
+        :returns: A `Sequence` object.
         """
         if not all(isinstance(v, list) for v in kwargs.values()):
             raise ValueError('Non-list argument provided')
@@ -105,13 +104,14 @@ class Sequence:
     def interpolated(cls, waypoints, counts):
         """Creates a sequence interpolated from a list of waypoints.
 
-        Args:
-            waypoints (seq): A starfish.Sequence object (or just a list of starfish.Frame objects) representing the
-                waypoints to interpolate between. (tip: use the starfish.Sequence.standard constructor to create this.)
-            counts (int or seq): The number of frames to generate between each pair of waypoints. There will be
-                counts[i] frames in between waypoints[i] (inclusive) and waypoints[i+1] (exclusive). The total number of
-                frames in the sequence will be sum(counts) + 1. The length of counts should be 1 less than the length of
-                waypoints. (If count is an integer, then there should only be 2 waypoints.)
+        :param waypoints: (seq): A starfish.Sequence object (or just a list of starfish.Frame objects) representing the
+            waypoints to interpolate between. (tip: use the starfish.Sequence.standard constructor to create this.)
+        :param counts: (int or seq): The number of frames to generate between each pair of waypoints. There will be
+            counts[i] frames in between waypoints[i] (inclusive) and waypoints[i+1] (exclusive). The total number of
+            frames in the sequence will be sum(counts) + 1. The length of counts should be 1 less than the length of
+            waypoints. (If count is an integer, then there should only be 2 waypoints.)
+
+        :returns: A `Sequence` object.
         """
         try:
             iter(counts)
@@ -134,14 +134,16 @@ class Sequence:
     def exhaustive(cls, **kwargs):
         """Creates a sequence that includes every possible combination of the parameters given.
 
-        The arguments to this constructor are the same as those to the starfish.Frame constructor, except instead of
-        a single value, each argument may also be a list of values. For example, while `position` is normally an
+        The arguments to this constructor are the same as those to the `Frame` constructor, except instead of
+        a single value, each argument may also be a list of values. For example, while ``position`` is normally an
         iterable of length 3 representing a 3D vector, it could instead be a list of 3D vectors (i.e. an array of
         shape (n, 3)).
 
         This constructor then takes the lists of values for each parameter and generates frames out of their cartesian
         product. For example, if 10 distances, 10 poses, and 10 offsets are provided, the generated sequence will be
         10*10*10 = 10,000 frames long, including every possible combination of given distances, poses, and offsets.
+
+        :returns: A `Sequence` object.
         """
         if not all(isinstance(v, list) for v in kwargs.values()):
             raise ValueError('Non-list argument provided')
@@ -159,17 +161,18 @@ class Sequence:
         """
         Creates keyframes representing this sequence, so that it can be played as a preview animation.  Keyframes will
         be adjacent to each other, so no interpolation will be done. This is just a means to get an idea of what frames
-        are in the sequence. If `len(frames)` is greater than `num`, only every `(len(frames) / num)` frames will be
-        displayed.
+        are in the sequence. If ``len(frames)`` is greater than ``num``, only every ``(len(frames) / num)`` frames will
+        be displayed.
 
-        This should not be called with large values of `num` (>5000), as it is quite slow and may cause Blender to hang.
+        This should not be called with large values of ``num`` (>5000), as it is quite slow and may crash Blender.
 
-        Args:
-            scene (BlendDataObject): the scene to set up the animation in
-            obj (BlendDataObject): the object that will be the subject of the picture
-            camera (BlendDataObject): the camera to take the picture with
-            sun (BlendDataObject): the sun lamp that is providing the lighting
-            num (int): The number of keyframes to generate. Defaults to min(100, len(frames))
+        :param scene: (BlendDataObject): the scene to set up the animation in
+        :param obj: (BlendDataObject): the object that will be the subject of the picture
+        :param camera: (BlendDataObject): the camera to take the picture with
+        :param sun: (BlendDataObject): the sun lamp that is providing the lighting
+        :param num: (int): The number of keyframes to generate. Defaults to ``min(100, len(frames))``
+
+        :returns: A `Sequence` object.
         """
         if num is None:
             num = min(100, len(self.frames))

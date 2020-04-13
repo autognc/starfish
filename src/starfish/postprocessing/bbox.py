@@ -3,12 +3,14 @@ import cv2
 
 
 def get_bounding_boxes_from_mask(mask, label_map):
-    """
-    Gets bounding boxes from instance masks.
+    """Gets bounding boxes from instance masks.
+
     :param mask: path to mask image (str) or numpy array of mask image (RGB)
     :param label_map: dictionary mapping classes (str) to their corresponding color(s). Each class can correspond to a
-        single color (e.g. {"cygnus": (0, 0, 206)}) or multiple colors (e.g. {"cygnus": [(0, 0, 206), (206, 0, 0)]})
-    :return: a dictionary mapping classes (str) to their corresponding
+        single color (e.g. ``{"cygnus": (0, 0, 206)}``) or multiple colors (e.g.
+        ``{"cygnus": [(0, 0, 206), (206, 0, 0)]}``)
+
+    :returns: a dictionary mapping classes (str) to their corresponding
         bboxes (a dictionary with the keys 'xmin', 'xmax', 'ymin', 'ymax'). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
@@ -33,12 +35,14 @@ def get_bounding_boxes_from_mask(mask, label_map):
 
 
 def get_centroids_from_mask(mask, label_map):
-    """
-    Gets bounding boxes from instance masks.
+    """Gets centroids from instance masks.
+
     :param mask: path to mask image (str) or numpy array of mask image (RGB)
     :param label_map: dictionary mapping classes (str) to their corresponding color(s). Each class can correspond to a
-        single color (e.g. {"cygnus": (0, 0, 206)}) or multiple colors (e.g. {"cygnus": [(0, 0, 206), (206, 0, 0)]})
-    :return: a dictionary mapping classes (str) to their corresponding
+        single color (e.g. ``{"cygnus": (0, 0, 206)}``) or multiple colors (e.g.
+        ``{"cygnus": [(0, 0, 206), (206, 0, 0)]}``)
+
+    :returns: a dictionary mapping classes (str) to their corresponding
         centroids (y, x). If a class does not appear in the image,
         then it will not appear in the keys of the returned dictionary.
     """
