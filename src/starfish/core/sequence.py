@@ -82,7 +82,7 @@ class Sequence:
 
         :returns: A `Sequence` object.
         """
-        if not all(isinstance(v, list) for v in kwargs.values()):
+        if not all(isinstance(v, list) or isinstance(v, np.ndarray) for v in kwargs.values()):
             raise ValueError('Non-list argument provided')
         kwargs_multi = {k: v for k, v in kwargs.items() if len(v) > 1}
         if kwargs_multi:
@@ -145,7 +145,7 @@ class Sequence:
 
         :returns: A `Sequence` object.
         """
-        if not all(isinstance(v, list) for v in kwargs.values()):
+        if not all(isinstance(v, list) or isinstance(v, np.ndarray) for v in kwargs.values()):
             raise ValueError('Non-list argument provided')
 
         if not kwargs:

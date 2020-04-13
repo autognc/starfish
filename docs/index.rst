@@ -5,7 +5,7 @@ Starfish is a Python library for automatically creating synthetic, labeled image
 
 This library it extends Blender's powerful Python scripting ability, providing utilities that make it easy to generate
 long sequences of synthetic images with intuitive parameters. It was designed for people who, like me, know Python
-better than they know Blender.
+much better than they know Blender.
 
 These sequences can be smoothly interpolated from waypoint to waypoint, much like a traditional keyframe-based
 animation. They can also be exhaustive or random, containing images with various object poses, backgrounds, and lighting

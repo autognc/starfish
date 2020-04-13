@@ -36,8 +36,8 @@ class Frame:
             identity quaternion (aka zero rotation), which corresponds to the camera looking directly in the
             object's -Z direction with the object's +X direction pointing up and +Y pointing to the right)
         :param lighting: (rotation): the angle of the sun's lighting relative to the camera's coordinate system (
-        default: the identity quaternion (aka zero rotation), which corresponds to the light coming from directly
-        behind the camera)
+            default: the identity quaternion (aka zero rotation), which corresponds to the light coming from directly
+            behind the camera)
         :param offset: (seq of float, len 2): the (horizontal, vertical) translational offset of the object from the
             center of the picture frame. Expressed as a fraction of the distance from edge to edge: e.g., for horizontal
             offset, 0.0 is the left edge, 0.5 is the center, and 1.0 is the right edge. Same for vertical,
