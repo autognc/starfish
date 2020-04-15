@@ -63,28 +63,29 @@ def uniform_sphere(n, random=None):
         return np.random.choice(theta, random), np.random.choice(theta, random)
 
 
+def _recursive_jsonify(value):
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return {k: _recursive_jsonify(v) for k, v in value.items()}
+    # handle rotations
+    try:
+        return list(to_quat(value))
+    except AttributeError:
+        # handle vectors
+        if isinstance(value, Vector):
+            return list(value)
+    # handle any other iterable
+    try:
+        return [_recursive_jsonify(v) for v in value]
+    except TypeError:
+        return value
+
+
 def jsonify(obj):
     """Serializes an object's attributes into a JSON string with support for mathutils objects.
 
     All rotation objects are converted to a 4-element list representing wxyz quaternion form.
     All vectors are converted to a 3-element list.
     """
-    def recursive_handle(value):
-        if isinstance(value, str):
-            return value
-        if isinstance(value, dict):
-            return {k: recursive_handle(v) for k, v in value.items()}
-        # handle rotations
-        try:
-            return list(to_quat(value))
-        except AttributeError:
-            # handle vectors
-            if isinstance(value, Vector):
-                return list(value)
-        # handle any other iterable
-        try:
-            return [recursive_handle(v) for v in value]
-        except TypeError:
-            return value
-
-    return json.dumps(recursive_handle(vars(obj)), indent=4)
+    return json.dumps(_recursive_jsonify(vars(obj)), indent=4)

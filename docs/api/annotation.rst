@@ -1,6 +1,6 @@
 ============================
-Postprocessing
+Annotation
 ============================
 
-.. automodule:: starfish.postprocessing
+.. automodule:: starfish.annotation
     :members:

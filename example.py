@@ -4,7 +4,7 @@ import numpy as np
 from mathutils import Euler
 from starfish import Sequence
 from starfish.utils import random_rotations
-from starfish.postprocessing import normalize_mask_colors, get_centroids_from_mask, get_bounding_boxes_from_mask
+from starfish.annotation import normalize_mask_colors, get_centroids_from_mask, get_bounding_boxes_from_mask
 
 # create a standard sequence of random configurations...
 seq1 = Sequence.standard(
@@ -26,6 +26,7 @@ seq3 = Sequence.interpolated(
 )
 
 for seq in [seq1, seq2, seq3]:
+    # render loop
     for i, frame in enumerate(seq):
         # non-starfish Blender stuff: e.g. setting file output paths
         bpy.data.scenes['Real'].node_tree.nodes['File Output'].file_slots[0].path = f'real_{i}.png'
@@ -45,6 +46,7 @@ for seq in [seq1, seq2, seq3]:
         # postprocessing
         label_map = {'object': (255, 255, 255), 'background': (0, 0, 0)}
         clean_mask = normalize_mask_colors(f'mask_{i}.png', label_map.values())
+        del label_map['background']
         bboxes = get_bounding_boxes_from_mask(clean_mask, label_map)
         centroids = get_centroids_from_mask(clean_mask, label_map)
 

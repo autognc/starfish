@@ -9,7 +9,7 @@ setup(name='starfish',
       packages=find_packages('src'),
       package_dir={'': 'src'},
       install_requires=[
-          'numpy~=1.16.1',
+          'numpy>=1.16.1',
           'opencv-python~=4.2.0',
           'mathutils~=2.81.2'
       ],
