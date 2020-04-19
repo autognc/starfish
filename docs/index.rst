@@ -22,6 +22,11 @@ tasks where annotated real data may be difficult to obtain.
     Home <self>
     api/index
 
+Requirements
+------------------------------------
+Though Starfish has only been tested with Blender 2.82, it should work with any version 2.8+. Please open an issue
+on `GitHub <https://github.com/autognc/starfish>`_ if it doesn't.
+
 Installation
 ------------------------------------
 #. Identify the location of your Blender scripts directory. This can be done by opening Blender, clicking on the
@@ -29,11 +34,12 @@ Installation
    Linux, the default location is ``~/.config/blender/[VERSION]/scripts``. From now on, this path will be referred to as
    ``[SCRIPTS_DIR]``.
 #. Create the addon modules directory, if it does not exist already: ``mkdir -p [SCRIPTS_DIR]/addons/modules``
-#. Install the library to Blender: ``pip install https://github.com/autognc/starfish --no-deps --target
-   [SCRIPTS_DIR]/addons/modules``. Starfish does not require any additional packages besides what is already bundled
+#. Install the library to Blender: ``pip install git+https://github.com/autognc/starfish --no-deps --target [SCRIPTS_DIR]/addons/modules``.
+   Starfish does not require any additional packages besides what is already bundled
    with Blender, which is why ``--no-deps`` can be used.
 
-Starfish can also be pip-installed normally without Blender for testing purposes or for independent usage.
+Starfish can also be pip-installed normally without Blender for testing purposes or for independent usage of certain
+modules.
 
 Quickstart
 ------------------------------------

@@ -20,6 +20,11 @@ tasks where annotated real data may be difficult to obtain.
     :local:
     :depth: 2
 
+Requirements
+------------------------------------
+Though Starfish has only been tested with Blender 2.82, it should work with any version 2.8+. Please open an issue
+if it doesn't.
+
 Installation
 ------------------------------------
 #. Identify the location of your Blender scripts directory. This can be done by opening Blender, clicking on the
@@ -27,12 +32,12 @@ Installation
    Linux, the default location is ``~/.config/blender/[VERSION]/scripts``. From now on, this path will be referred to as
    ``[SCRIPTS_DIR]``.
 #. Create the addon modules directory, if it does not exist already: ``mkdir -p [SCRIPTS_DIR]/addons/modules``
-#. Install the library to Blender: ``pip install https://github.com/autognc/starfish --no-deps --target
-   [SCRIPTS_DIR]/addons/modules``. Starfish does not require any additional packages besides what is already bundled
+#. Install the library to Blender: ``pip install git+https://github.com/autognc/starfish --no-deps --target [SCRIPTS_DIR]/addons/modules``.
+   Starfish does not require any additional packages besides what is already bundled
    with Blender, which is why ``--no-deps`` can be used.
 
-Starfish can also be pip-installed normally without Blender for testing purposes or for independent usage of the
-``postprocessing`` module.
+Starfish can also be pip-installed normally without Blender for testing purposes or for independent usage of certain
+modules.
 
 Quickstart
 ------------------------------------
@@ -101,21 +106,29 @@ Once you've created a sequences, you can iterate through its frames like so::
 The ``Sequence.bake`` method also provides an easy way to 'preview' sequences that you're working
 on in Blender. See ``Sequence`` for more detail.
 
-Postprocessing
+Utils
+""""""""""
+The ``utils`` module provides a few more functions that may be useful for core image generation, such as
+``random_rotations`` or ``uniform_sphere``.
+
+Annotation
 """""""""""""""""""
-Starfish also contains a (currently small) ``postprocessing module`` for common image
-postprocessing operations.
+Starfish also contains an ``annotation`` module that provides utility functions
+related to annotating generated data.
 
-One common type of annotation generated for computer vision task is some sort of segmentation mask (e.g. using the `ID
-Mask Node <https://docs.blender.org/manual/en/latest/compositing/types/converter/id_mask.html>`) where having perfectly
-uniform colors is important. Unfortunately, I've often encountered an issue in Blender where the output colors differ
-slightly: for example, instead of the background being solid ``rgb(0, 0, 0)`` black, it will actually be a random mix of
-``rgb(0, 0, 1)``, ``rgb(1, 1, 0)``, etc. The ``normalize_mask_colors``
-function can be used to clean up such images.
-
-Once a mask has been cleaned up, ``get_bounding_boxes_from_mask``
-and ``get_centroids_from_mask`` can be used to get the bounding boxes
-and centroids of segmented areas, respectively.
+* One common type of annotation generated for computer vision tasks is some sort of segmentation mask (e.g. using the
+  `ID Mask Node <https://docs.blender.org/manual/en/latest/compositing/types/converter/id_mask.html>`_) where having perfectly
+  uniform colors is important. Unfortunately, I've often encountered an issue in Blender where the output colors differ
+  slightly: for example, instead of the background being solid ``rgb(0, 0, 0)`` black, it will actually be a random mix of
+  ``rgb(0, 0, 1)``, ``rgb(1, 1, 0)``, etc. The ``normalize_mask_colors``
+  function can be used to clean up such images.
+* Once a mask has been cleaned up, ``get_bounding_boxes_from_mask``
+  and ``get_centroids_from_mask`` can be used to get the bounding boxes
+  and centroids of segmented areas, respectively.
+* Another common type of annotation is keypoints: e.g. where particular 3D points on the object appear in the 2D image.
+  ``generate_keypoints`` can be used to automatically generate evenly distributed
+  3D keypoints from an object's mesh; ``project_keypoints_onto_image``
+  can then take these keypoints and map them to 2D image locations after rendering a particular frame.
 
 Example Script
 ^^^^^^^^^^^^^^^^^^^^^^

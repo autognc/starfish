@@ -1,3 +1,10 @@
+"""
+IMPORTANT NOTE: This script is just for demonstrating the various capabilities of Starfish, and is not meant
+to be run as-is. If you try to run this script without modifications, it will probably not work, unless you have
+your Blend file set up with the exact same scenes, objects, and compositing nodes. Even then, it will immediately
+start rendering several long sequences and writing files to disk, with the files from each sequence overwriting
+the files from the previous one.
+"""
 import time
 import bpy
 import numpy as np
