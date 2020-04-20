@@ -86,25 +86,31 @@ def _distribute_particles_random(obj, num, seed):
     import bpy
 
     # randomly distribute keypoints using Blender's particle system
-    modifier = obj.modifiers.new('', 'PARTICLE_SYSTEM')
-    psys = modifier.particle_system
-    psys.seed = seed
-    psys.settings.count = num
-    psys.settings.emit_from = 'FACE'
-    psys.settings.distribution = 'RAND'
-    psys.settings.use_even_distribution = True
+    modifier = None
+    try:
+        bpy.context.collection.objects.link(obj)
+        modifier = obj.modifiers.new('_STARFISH_GENERATED_PARTICLE_SYSTEM', 'PARTICLE_SYSTEM')
+        psys = modifier.particle_system
+        psys.seed = seed
+        psys.settings.count = num
+        psys.settings.emit_from = 'FACE'
+        psys.settings.distribution = 'RAND'
+        psys.settings.use_even_distribution = True
 
-    # force an update to distribute particles
-    bpy.context.view_layer.update()
-    eval_obj = bpy.context.evaluated_depsgraph_get().objects.get(obj.name, None)
+        # force an update to distribute particles
+        bpy.context.view_layer.update()
+        eval_obj = bpy.context.evaluated_depsgraph_get().objects.get(obj.name, None)
 
-    # extract particle locations and return
-    particles = [tuple(obj.matrix_world.inverted() @ p.location)
-                 for p in eval_obj.particle_systems[-1].particles.values()]
-    obj.modifiers.remove(modifier)
-    if len(particles) != num:
-        raise RuntimeError('Error generating initial random particles')
-    return particles
+        # extract particle locations and return
+        particles = [tuple(obj.matrix_world.inverted() @ p.location)
+                     for p in eval_obj.particle_systems[-1].particles.values()]
+        if len(particles) != num:
+            raise RuntimeError('Error generating initial random particles')
+        return particles
+    finally:
+        if modifier:
+            obj.modifiers.remove(modifier)
+        bpy.context.collection.objects.unlink(obj)
 
 
 def generate_keypoints(obj, num, stop=1, oversample=10, seed=0):
