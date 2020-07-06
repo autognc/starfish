@@ -24,7 +24,7 @@ def interp(a, b, n, endpoint=True):
         "lighting": [a.lighting.slerp(b.lighting, t) for t in np.linspace(0, 1, n, endpoint)],
         "offset": [t for t in zip(np.linspace(a.offset[0], b.offset[0], n, endpoint),
                                   np.linspace(a.offset[1], b.offset[1], n, endpoint))],
-        "background": [a.background.to_quaternion().slerp(b.background.to_quaternion(), t) for t in
+        "background": [a.background.slerp(b.background, t) for t in
                        np.linspace(0, 1, n, endpoint)]
     }
 
@@ -87,7 +87,7 @@ class Sequence:
         kwargs_multi = {k: v for k, v in kwargs.items() if len(v) > 1}
         if kwargs_multi:
             lengths = list(map(len, kwargs_multi.values()))
-            if not all(lengths[0] == l for l in lengths):
+            if not all(lengths[0] == length for length in lengths):
                 raise ValueError('Parameter lists of differing lengths were provided')
             length = lengths[0]
 
